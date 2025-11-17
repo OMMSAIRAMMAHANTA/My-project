@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Omm Sairam Mahanta - Gaming Portfolio</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <style>
+        /* --- GLOBAL STYLES --- */
+        body {
+            margin: 0; padding: 0;
+            background: url('https://image2url.com/images/1763374021173-7883e334-bb59-434f-a32d-83e8604794f2.jpeg') no-repeat center center/cover;
+            background-attachment: fixed;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #fff;
+            user-select: none; /* Prevent text selection during games */
+        }
+        .overlay { background: rgba(0,0,0,0.60); width: 100%; min-height: 100vh; padding-bottom: 50px; }
+
+        /* NAVBAR */
+        nav {
+            display: flex; justify-content: space-between; padding: 15px 10%;
+            background: rgba(0, 0, 0, 0.8); backdrop-filter: blur(5px);
+            position: sticky; top: 0; z-index: 100; border-bottom: 1px solid #00eaff;
+        }
+        nav .logo { font-size: 20px; font-weight: bold; color: #00eaff; text-transform: uppercase; letter-spacing: 2px; }
+        nav a { margin-left: 20px; text-decoration: none; color: white; font-weight: 600; transition: 0.3s; }
+        nav a:hover { color: #00eaff; text-shadow: 0 0 10px #00eaff; }
+
+        /* SECTIONS */
+        .hero { text-align: center; padding: 100px 20px; }
+        .hero h1 { font-size: 45px; text-shadow: 0 0 20px #00eaff; }
+        .hero span { color: #00eaff; }
+        .btn {
+            margin-top: 15px; padding: 10px 25px;
+            background: linear-gradient(45deg, #00eaff, #008cff);
+            color: #000; border-radius: 30px; border: none;
+            font-weight: bold; cursor: pointer; transition: 0.3s;
+            box-shadow: 0 0 15px rgba(0, 234, 255, 0.5);
+        }
+        .btn:hover { transform: scale(1.05); box-shadow: 0 0 25px rgba(0, 234, 255, 0.8); }
+        .btn-red { background: linear-gradient(45deg, #ff4d4d, #c0392b); box-shadow: 0 0 15px rgba(255, 77, 77, 0.5); color: white; }
+
+        .section { padding: 40px 10%; }
+        .section-title { text-align: center; font-size: 32px; margin-bottom: 30px; color: #00eaff; border-bottom: 2px solid #00eaff; display: inline-block; }
+        
+        .card-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 25px; }
+        .card {
+            background: rgba(0,0,0,0.7); padding: 25px; border-radius: 15px;
+            border: 1px solid rgba(255,255,255,0.1); text-align: center; transition: 0.3s;
+        }
+        .card:hover { transform: translateY(-10px); border-color: #00eaff; box-shadow: 0 0 20px rgba(0,234,255,0.2); }
+        .card i { font-size: 40px; margin-bottom: 10px; color: #00eaff; }
+
+        /* FOLLOW US BAR */
+        .social-bar {
+            margin-top: 20px; background: rgba(255, 255, 255, 0.1); padding: 15px;
+            border-radius: 50px; display: flex; justify-content: center; gap: 20px;
+            backdrop-filter: blur(5px); border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .social-icon {
+            width: 50px; height: 50px; background: #000; border-radius: 50%;
+            display: flex; justify-content: center; align-items: center;
+            text-decoration: none; color: white; font-size: 24px; transition: 0.3s; border: 2px solid #00eaff;
+        }
+        .social-icon:hover { transform: translateY(-5px); color: #fff; }
+        .fa-facebook-f:hover { background: #1877F2; border-color: #1877F2; }
+        .fa-x-twitter:hover { background: #000; border-color: #fff; }
+        .fa-youtube:hover { background: #FF0000; border-color: #FF0000; }
+        .fa-instagram:hover { background: radial-gradient(circle at 30% 107%, #fdf497 0%, #fdf497 5%, #fd5949 45%, #d6249f 60%, #285AEB 90%); border-color: #d6249f; }
+
+        /* --- MODAL & GAMES COMMON --- */
+        .modal {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.95); z-index: 2000;
+            justify-content: center; align-items: center; flex-direction: column;
+        }
+        .game-ui { text-align: center; animation: fadeIn 0.5s ease; width: 90%; max-width: 500px; }
+        @keyframes fadeIn { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
+        
+        /* TIC TAC TOE STYLES */
+        .mode-select { display: flex; gap: 10px; justify-content: center; margin-bottom: 20px; flex-wrap: wrap; }
+        #ttt-board { display: grid; grid-template-columns: repeat(3, 100px); gap: 10px; justify-content: center; margin: 20px auto; }
+        .ttt-cell {
+            width: 100px; height: 100px; background: rgba(255,255,255,0.1); border-radius: 10px;
+            display: flex; justify-content: center; align-items: center; font-size: 45px;
+            cursor: pointer; border: 1px solid #444; color: white;
+        }
+        .ttt-cell.winner { background: rgba(0, 234, 255, 0.3); text-shadow: 0 0 20px #00eaff; }
+
+        /* MEMORY GAME STYLES */
+        .memory-grid {
+            display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin: 20px auto;
+            perspective: 1000px; max-width: 400px;
+        }
+        .memory-card {
+            height: 80px; background: transparent; cursor: pointer;
+            position: relative; transform-style: preserve-3d; transition: transform 0.5s;
+        }
+        .memory-card.flipped { transform: rotateY(180deg); }
+        .front, .back {
+            width: 100%; height: 100%; position: absolute; border-radius: 8px;
+            display: flex; justify-content: center; align-items: center; font-size: 30px;
+            backface-visibility: hidden; border: 1px solid rgba(0,234,255,0.5);
+        }
+        .front { background: rgba(0,0,0,0.8); color: #00eaff; transform: rotateY(180deg); } /* Icon side */
+        .back { background: linear-gradient(45deg, #00eaff, #008cff); color: black; font-size: 24px; } /* Cover side */
+
+        /* SNAKE GAME STYLES */
+        canvas {
+            background: #000; border: 2px solid #00eaff; box-shadow: 0 0 20px rgba(0,234,255,0.4);
+            display: block; margin: 0 auto; max-width: 100%;
+        }
+        .controls { margin-top: 10px; display: flex; justify-content: center; gap: 15px; }
+        .ctrl-btn { width: 50px; height: 50px; border-radius: 50%; font-size: 20px; background: rgba(255,255,255,0.1); border: 1px solid #00eaff; color: white; }
+
+        /* TABLE */
+        table { width: 100%; border-collapse: collapse; }
+        td { padding: 15px; border-bottom: 1px solid #444; }
+        td:first-child { color: #00eaff; font-weight: bold; width: 40%; }
+
+        footer { text-align: center; padding: 30px; background: #000; margin-top: 40px; font-size: 14px; color: #888; }
+
+        @media (max-width: 768px) {
+            nav { flex-direction: column; text-align: center; gap: 15px; }
+            #ttt-board { grid-template-columns: repeat(3, 80px); }
+            .ttt-cell { width: 80px; height: 80px; }
+            .memory-card { height: 60px; }
+        }
+    </style>
+</head>
+
+<body>
+<div class="overlay">
+
+    <nav>
+        <div class="logo">OMM SAIRAM</div>
+        <div>
+            <a href="#home">Home</a>
+            <a href="#about">Biodata</a>
+            <a href="#projects">Games</a>
+            <a href="#contact">Contact</a>
+        </div>
+    </nav>
+
+    <section id="home" class="hero">
+        <h1>Hello, I'm <span>Omm Sairam Mahanta</span></h1>
+        <p>Programmer | Gamer | Creative Editor</p>
+        <a class="btn" href="#projects">Play Games</a>
+    </section>
+
+    <section id="about" class="section">
+        <center><h2 class="section-title">Biodata</h2></center>
+        <div class="card">
+            <table>
+                <tr><td>Name</td><td>Omm Sairam Mahanta</td></tr>
+                <tr><td>DOB</td><td>20/02/2006</td></tr>
+                <tr><td>Education</td><td>B.Tech (CSE)</td></tr>
+                <tr><td>Skills</td><td>Java, Python, HTML/CSS, Gaming</td></tr>
+                <tr><td>Address</td><td>Tihadiposi, Keonjhar, Odisha</td></tr>
+            </table>
+        </div>
+    </section>
+
+    <section id="projects" class="section">
+        <center><h2 class="section-title">My Game Projects</h2></center>
+        <div class="card-container">
+            
+            <div class="card">
+                <i class="fa-solid fa-chess-board"></i>
+                <h3>Super Tic Tac Toe</h3>
+                <p>Classic game with 3 Difficulty Levels.</p>
+                <button class="btn" onclick="openTTT()">Play Now</button>
+            </div>
+
+            <div class="card">
+                <i class="fa-solid fa-brain"></i>
+                <h3>Memory Master</h3>
+                <p>Find matching pairs. Test your brain!</p>
+                <button class="btn" onclick="openMemory()">Play Now</button>
+            </div>
+
+            <div class="card">
+                <i class="fa-solid fa-staff-snake"></i>
+                <h3>Neon Snake</h3>
+                <p>High graphics snake with speed twist.</p>
+                <button class="btn" onclick="openSnake()">Play Now</button>
+            </div>
+        </div>
+    </section>
+
+    <section id="contact" class="section">
+        <center><h2 class="section-title">Connect With Me</h2></center>
+        <div class="card">
+            <p style="font-size: 18px;"><b>📞 Phone:</b> 7849025583</p>
+            <p style="font-size: 18px;"><b>📧 Email:</b> saimahanta3@gmail.com</p>
+            
+            <hr style="border-color: rgba(255,255,255,0.1); margin: 20px 0;">
+            
+            <h3>Follow Us</h3>
+            <div class="social-bar">
+                <a href="https://www.facebook.com/" target="_blank" class="social-icon"><i class="fab fa-facebook-f"></i></a>
+                <a href="https://twitter.com" target="_blank" class="social-icon"><i class="fa-brands fa-x-twitter"></i></a>
+                <a href="https://www.youtube.com/@three_brothers426" target="_blank" class="social-icon"><i class="fab fa-youtube"></i></a>
+                <a href="https://www.instagram.com/s_ensei_426" target="_blank" class="social-icon"><i class="fab fa-instagram"></i></a>
+            </div>
+        </div>
+    </section>
+
+    <footer>Copyright © 2025 Omm Sairam Mahanta</footer>
+</div>
+
+<div id="tttModal" class="modal">
+    <div class="game-ui">
+        <h2>Tic Tac Toe</h2>
+        <div class="mode-select">
+            <button class="btn" onclick="setDifficulty('easy')">Easy (Basic)</button>
+            <button class="btn" onclick="setDifficulty('medium')">Medium</button>
+            <button class="btn" onclick="setDifficulty('hard')">Hard (AI)</button>
+        </div>
+        <p id="tttStatus" style="color:#00eaff;">Select a difficulty to start</p>
+        <div id="ttt-board"></div>
+        <button class="btn btn-red" onclick="closeModal('tttModal')">Close Game</button>
+    </div>
+</div>
+
+<div id="memoryModal" class="modal">
+    <div class="game-ui">
+        <h2>Memory Game</h2>
+        <p style="color:#aaa;">Flip cards to find matching pairs</p>
+        <div class="memory-grid" id="memoryGrid"></div>
+        <h3 id="memoryStatus" style="color:#00eaff; height:20px;"></h3>
+        <button class="btn" onclick="initMemory()">Restart</button>
+        <button class="btn btn-red" onclick="closeModal('memoryModal')">Close Game</button>
+    </div>
+</div>
+
+<div id="snakeModal" class="modal">
+    <div class="game-ui">
+        <h2>Neon Snake</h2>
+        <p>Score: <span id="snakeScore" style="color:#00eaff; font-weight:bold;">0</span> | Twist: Speed Increases!</p>
+        <canvas id="snakeCanvas" width="300" height="300"></canvas>
+        <div class="controls">
+            <button class="ctrl-btn" onclick="changeDirection('LEFT')">⬅️</button>
+            <button class="ctrl-btn" onclick="changeDirection('UP')">⬆️</button>
+            <button class="ctrl-btn" onclick="changeDirection('DOWN')">⬇️</button>
+            <button class="ctrl-btn" onclick="changeDirection('RIGHT')">➡️</button>
+        </div>
+        <br>
+        <button class="btn" onclick="startSnake()">Restart</button>
+        <button class="btn btn-red" onclick="closeSnake()">Close Game</button>
+    </div>
+</div>
+
+<script>
+    // --- GENERAL MODAL FUNCTIONS ---
+    function closeModal(id) {
+        document.getElementById(id).style.display = "none";
+    }
+
+    /* ================= TIC TAC TOE LOGIC ================= */
+    let tttBoard = ["", "", "", "", "", "", "", "", ""];
+    let tttHuman = "X", tttAi = "O", tttDifficulty = "hard";
+    let tttActive = false;
+
+    function openTTT() {
+        document.getElementById("tttModal").style.display = "flex";
+        document.getElementById("ttt-board").innerHTML = "";
+        document.getElementById("tttStatus").innerText = "Select Difficulty";
+        tttActive = false;
+    }
+
+    function setDifficulty(level) {
+        tttDifficulty = level;
+        tttBoard.fill("");
+        tttActive = true;
+        document.getElementById("tttStatus").innerText = "Mode: " + level.toUpperCase() + " - Your Turn (X)";
+        renderTTT();
+    }
+
+    function renderTTT() {
+        const boardDiv = document.getElementById("ttt-board");
+        boardDiv.innerHTML = "";
+        tttBoard.forEach((val, i) => {
+            const cell = document.createElement("div");
+            cell.className = "ttt-cell " + (val ? "winner" : "");
+            cell.innerText = val;
+            cell.onclick = () => tttMove(i);
+            boardDiv.appendChild(cell);
+        });
+    }
+
+    function tttMove(i) {
+        if (!tttActive || tttBoard[i] !== "") return;
+        tttBoard[i] = tttHuman;
+        renderTTT();
+        if (checkTTTWin(tttHuman)) { endGameTTT("You Win!"); return; }
+        if (!tttBoard.includes("")) { endGameTTT("Draw!"); return; }
+        
+        setTimeout(() => {
+            let moveIndex;
+            if (tttDifficulty === 'easy') moveIndex = getRandomMove();
+            else if (tttDifficulty === 'medium') moveIndex = getMediumMove();
+            else moveIndex = getBestMove(); // Hard
+            
+            tttBoard[moveIndex] = tttAi;
+            renderTTT();
+            if (checkTTTWin(tttAi)) endGameTTT("AI Wins!");
+            else if (!tttBoard.includes("")) endGameTTT("Draw!");
+        }, 400);
+    }
+
+    function getRandomMove() {
+        let empty = tttBoard.map((v, i) => v === "" ? i : null).filter(v => v !== null);
+        return empty[Math.floor(Math.random() * empty.length)];
+    }
+
+    function getMediumMove() {
+        // 1. Try to win
+        for(let i=0; i<9; i++) {
+            if(tttBoard[i] == "") {
+                tttBoard[i] = tttAi;
+                if(checkTTTWin(tttAi)) { tttBoard[i] = ""; return i; }
+                tttBoard[i] = "";
+            }
+        }
+        // 2. Block human
+        for(let i=0; i<9; i++) {
+            if(tttBoard[i] == "") {
+                tttBoard[i] = tttHuman;
+                if(checkTTTWin(tttHuman)) { tttBoard[i] = ""; return i; }
+                tttBoard[i] = "";
+            }
+        }
+        return getRandomMove();
+    }
+
+    function getBestMove() {
+        // Minimax implementation (Simplified call)
+        let bestScore = -Infinity;
+        let move;
+        for(let i=0; i<9; i++) {
+            if(tttBoard[i] === "") {
+                tttBoard[i] = tttAi;
+                let score = minimax(tttBoard, 0, false);
+                tttBoard[i] = "";
+                if(score > bestScore) { bestScore = score; move = i; }
+            }
+        }
+        return move;
+    }
+
+    function minimax(board, depth, isMaximizing) {
+        if(checkTTTWin(tttAi)) return 10 - depth;
+        if(checkTTTWin(tttHuman)) return depth - 10;
+        if(!board.includes("")) return 0;
+
+        if(isMaximizing) {
+            let bestScore = -Infinity;
+            for(let i=0; i<9; i++) {
+                if(board[i] === "") {
+                    board[i] = tttAi;
+                    let score = minimax(board, depth + 1, false);
+                    board[i] = "";
+                    bestScore = Math.max(score, bestScore);
+                }
+            }
+            return bestScore;
+        } else {
+            let bestScore = Infinity;
+            for(let i=0; i<9; i++) {
+                if(board[i] === "") {
+                    board[i] = tttHuman;
+                    let score = minimax(board, depth + 1, true);
+                    board[i] = "";
+                    bestScore = Math.min(score, bestScore);
+                }
+            }
+            return bestScore;
+        }
+    }
+
+    function checkTTTWin(p) {
+        const wins = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
+        return wins.some(c => c.every(i => tttBoard[i] === p));
+    }
+    function endGameTTT(msg) { tttActive = false; document.getElementById("tttStatus").innerText = msg; }
+
+
+    /* ================= MEMORY GAME LOGIC ================= */
+    const icons = ['🍎','🍌','🍇','🍒','🚀','⚽','💎','🍕'];
+    let memoryCards = [...icons, ...icons];
+    let firstCard = null, secondCard = null;
+    let lockBoard = false;
+
+    function openMemory() {
+        document.getElementById("memoryModal").style.display = "flex";
+        initMemory();
+    }
+
+    function initMemory() {
+        const grid = document.getElementById("memoryGrid");
+        grid.innerHTML = "";
+        memoryCards.sort(() => 0.5 - Math.random());
+        document.getElementById("memoryStatus").innerText = "";
+        firstCard = null; lockBoard = false;
+
+        memoryCards.forEach(icon => {
+            const card = document.createElement("div");
+            card.classList.add("memory-card");
+            card.dataset.icon = icon;
+            card.innerHTML = `<div class="front">${icon}</div><div class="back">?</div>`;
+            card.onclick = flipCard;
+            grid.appendChild(card);
+        });
+    }
+
+    function flipCard() {
+        if (lockBoard || this === firstCard || this.classList.contains("flipped")) return;
+        this.classList.add("flipped");
+
+        if (!firstCard) {
+            firstCard = this;
+            return;
+        }
+        secondCard = this;
+        checkMatch();
+    }
+
+    function checkMatch() {
+        let isMatch = firstCard.dataset.icon === secondCard.dataset.icon;
+        if (isMatch) {
+            disableCards();
+        } else {
+            unflipCards();
+        }
+    }
+
+    function disableCards() {
+        firstCard = null; secondCard = null;
+        if(document.querySelectorAll('.flipped').length === memoryCards.length) {
+            document.getElementById("memoryStatus").innerText = "🎉 You Won!";
+        }
+    }
+
+    function unflipCards() {
+        lockBoard = true;
+        setTimeout(() => {
+            firstCard.classList.remove("flipped");
+            secondCard.classList.remove("flipped");
+            firstCard = null; secondCard = null;
+            lockBoard = false;
+        }, 1000);
+    }
+
+    /* ================= SNAKE GAME LOGIC ================= */
+    const canvas = document.getElementById("snakeCanvas");
+    const ctx = canvas.getContext("2d");
+    let snake, food, direction, gameLoop, score;
+    let speed = 200;
+
+    function openSnake() {
+        document.getElementById("snakeModal").style.display = "flex";
+        startSnake();
+    }
+    function closeSnake() {
+        clearInterval(gameLoop);
+        document.getElementById("snakeModal").style.display = "none";
+    }
+
+    function startSnake() {
+        snake = [{x: 10, y: 10}];
+        food = {x: 15, y: 15};
+        direction = "RIGHT";
+        score = 0;
+        speed = 200;
+        document.getElementById("snakeScore").innerText = score;
+        clearInterval(gameLoop);
+        gameLoop = setInterval(drawSnake, speed);
+    }
+
+    function drawSnake() {
+        // Clear screen
+        ctx.fillStyle = "#000";
+        ctx.fillRect(0, 0, 300, 300);
+
+        // Draw Food
+        ctx.fillStyle = "#ff0000";
+        ctx.shadowBlur = 15; ctx.shadowColor = "red";
+        ctx.fillRect(food.x * 15, food.y * 15, 15, 15);
+
+        // Move Snake
+        let head = {x: snake[0].x, y: snake[0].y};
+        if(direction === "LEFT") head.x--;
+        if(direction === "UP") head.y--;
+        if(direction === "RIGHT") head.x++;
+        if(direction === "DOWN") head.y++;
+
+        // Walls Collision
+        if(head.x < 0 || head.x >= 20 || head.y < 0 || head.y >= 20 || snake.some(s => s.x === head.x && s.y === head.y)) {
+            clearInterval(gameLoop);
+            alert("Game Over! Score: " + score);
+            return;
+        }
+
+        snake.unshift(head);
+
+        // Eat Food
+        if(head.x === food.x && head.y === food.y) {
+            score += 10;
+            document.getElementById("snakeScore").innerText = score;
+            food = {x: Math.floor(Math.random()*20), y: Math.floor(Math.random()*20)};
+            // TWIST: Increase Speed
+            if(speed > 50) {
+                clearInterval(gameLoop);
+                speed -= 5;
+                gameLoop = setInterval(drawSnake, speed);
+            }
+        } else {
+            snake.pop();
+        }
+
+        // Draw Snake Body
+        ctx.fillStyle = "#00eaff";
+        ctx.shadowBlur = 10; ctx.shadowColor = "cyan";
+        snake.forEach(part => ctx.fillRect(part.x * 15, part.y * 15, 13, 13));
+        ctx.shadowBlur = 0;
+    }
+
+    function changeDirection(dir) {
+        if(dir === "LEFT" && direction !== "RIGHT") direction = "LEFT";
+        if(dir === "UP" && direction !== "DOWN") direction = "UP";
+        if(dir === "RIGHT" && direction !== "LEFT") direction = "RIGHT";
+        if(dir === "DOWN" && direction !== "UP") direction = "DOWN";
+    }
+
+    document.addEventListener("keydown", e => {
+        if(e.key === "ArrowLeft") changeDirection("LEFT");
+        if(e.key === "ArrowUp") changeDirection("UP");
+        if(e.key === "ArrowRight") changeDirection("RIGHT");
+        if(e.key === "ArrowDown") changeDirection("DOWN");
+    });
+
+</script>
+</body>
+</html>
