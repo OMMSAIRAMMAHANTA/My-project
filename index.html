@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Omm Sairam Mahanta - Gaming Portfolio</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
@@ -14,7 +14,7 @@
             background-attachment: fixed;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             color: #fff;
-            user-select: none; /* Prevent text selection during games */
+            user-select: none;
         }
         .overlay { background: rgba(0,0,0,0.60); width: 100%; min-height: 100vh; padding-bottom: 50px; }
 
@@ -32,6 +32,7 @@
         .hero { text-align: center; padding: 100px 20px; }
         .hero h1 { font-size: 45px; text-shadow: 0 0 20px #00eaff; }
         .hero span { color: #00eaff; }
+        
         .btn {
             margin-top: 15px; padding: 10px 25px;
             background: linear-gradient(45deg, #00eaff, #008cff);
@@ -53,7 +54,17 @@
         .card:hover { transform: translateY(-10px); border-color: #00eaff; box-shadow: 0 0 20px rgba(0,234,255,0.2); }
         .card i { font-size: 40px; margin-bottom: 10px; color: #00eaff; }
 
-        /* FOLLOW US BAR */
+        /* BIODATA TABLE */
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        td { padding: 12px 15px; border-bottom: 1px solid rgba(255, 255, 255, 0.1); font-size: 1.1rem; }
+        
+        td:first-child { 
+            color: #00eaff; font-weight: bold; width: 35%; 
+            text-align: right; border-right: 2px solid rgba(0, 234, 255, 0.3); padding-right: 20px; 
+        }
+        td:last-child { text-align: left; padding-left: 20px; color: #eee; }
+
+        /* SOCIAL BAR */
         .social-bar {
             margin-top: 20px; background: rgba(255, 255, 255, 0.1); padding: 15px;
             border-radius: 50px; display: flex; justify-content: center; gap: 20px;
@@ -65,69 +76,136 @@
             text-decoration: none; color: white; font-size: 24px; transition: 0.3s; border: 2px solid #00eaff;
         }
         .social-icon:hover { transform: translateY(-5px); color: #fff; }
-        .fa-facebook-f:hover { background: #1877F2; border-color: #1877F2; }
-        .fa-x-twitter:hover { background: #000; border-color: #fff; }
-        .fa-youtube:hover { background: #FF0000; border-color: #FF0000; }
-        .fa-instagram:hover { background: radial-gradient(circle at 30% 107%, #fdf497 0%, #fdf497 5%, #fd5949 45%, #d6249f 60%, #285AEB 90%); border-color: #d6249f; }
 
-        /* --- MODAL & GAMES COMMON --- */
+        footer { text-align: center; padding: 30px; background: #000; margin-top: 40px; font-size: 14px; color: #888; }
+
+        /* --- MODALS --- */
         .modal {
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0, 0, 0, 0.95); z-index: 2000;
             justify-content: center; align-items: center; flex-direction: column;
+            overflow-y: auto;
         }
         .game-ui { text-align: center; animation: fadeIn 0.5s ease; width: 90%; max-width: 500px; }
         @keyframes fadeIn { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
+
+        /* --- CHESS STYLES --- */
+        #chessModal { background: #111; font-family: 'Segoe UI', system-ui, sans-serif; }
+        .chess-wrapper { width: 100%; max-width: 1100px; display: flex; justify-content: center; }
         
-        /* TIC TAC TOE STYLES */
-        .mode-select { display: flex; gap: 10px; justify-content: center; margin-bottom: 20px; flex-wrap: wrap; }
-        #ttt-board { display: grid; grid-template-columns: repeat(3, 100px); gap: 10px; justify-content: center; margin: 20px auto; }
-        .ttt-cell {
-            width: 100px; height: 100px; background: rgba(255,255,255,0.1); border-radius: 10px;
-            display: flex; justify-content: center; align-items: center; font-size: 45px;
-            cursor: pointer; border: 1px solid #444; color: white;
+        .app-layout {
+            display: flex; flex-direction: row; align-items: flex-start; justify-content: center;
+            gap: 30px; width: 100%; perspective: 1000px; opacity: 0; transition: opacity 1s;
         }
-        .ttt-cell.winner { background: rgba(0, 234, 255, 0.3); text-shadow: 0 0 20px #00eaff; }
+        .board-column { display: flex; flex-direction: column; align-items: center; gap: 15px; width: 100%; max-width: 500px; }
 
-        /* MEMORY GAME STYLES */
-        .memory-grid {
-            display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin: 20px auto;
-            perspective: 1000px; max-width: 400px;
+        /* THIS CLASS SWAPS THE TIMERS */
+        .flipped-layout { flex-direction: column-reverse; }
+
+        .player-bar {
+            width: 100%; display: flex; justify-content: space-between; align-items: center;
+            background: #222; padding: 10px 20px; border-radius: 8px; border: 2px solid #333; transition: all 0.3s;
         }
-        .memory-card {
-            height: 80px; background: transparent; cursor: pointer;
-            position: relative; transform-style: preserve-3d; transition: transform 0.5s;
+        .player-name { font-weight: bold; color: #aaa; text-transform: uppercase; font-size: 0.9rem; }
+        .timer-display { font-family: monospace; font-size: 1.5rem; font-weight: bold; color: #fff; }
+        .active-turn { border-color: #baca44; background: #2a2a2a; box-shadow: 0 0 20px rgba(186, 202, 68, 0.2); transform: scale(1.02); }
+        .active-turn .timer-display { color: #baca44; }
+        .active-turn .player-name { color: #fff; }
+
+        #board-wrapper {
+            position: relative; width: 100%; aspect-ratio: 1 / 1;
+            transform: rotateX(5deg); transition: transform 0.3s; box-shadow: 0 30px 60px rgba(0,0,0,0.8);
         }
-        .memory-card.flipped { transform: rotateY(180deg); }
-        .front, .back {
-            width: 100%; height: 100%; position: absolute; border-radius: 8px;
-            display: flex; justify-content: center; align-items: center; font-size: 30px;
-            backface-visibility: hidden; border: 1px solid rgba(0,234,255,0.5);
+        #chess-board {
+            width: 100%; height: 100%; display: grid; grid-template-columns: repeat(8, 1fr);
+            grid-template-rows: repeat(8, 1fr); border: 8px solid #444; border-radius: 4px; background: #000;
+            transition: transform 0.5s ease;
         }
-        .front { background: rgba(0,0,0,0.8); color: #00eaff; transform: rotateY(180deg); } /* Icon side */
-        .back { background: linear-gradient(45deg, #00eaff, #008cff); color: black; font-size: 24px; } /* Cover side */
+        
+        /* FLIP CLASSES */
+        .flipped-board { transform: rotate(180deg) !important; }
+        .flipped-board .square { transform: rotate(180deg) !important; }
 
-        /* SNAKE GAME STYLES */
-        canvas {
-            background: #000; border: 2px solid #00eaff; box-shadow: 0 0 20px rgba(0,234,255,0.4);
-            display: block; margin: 0 auto; max-width: 100%;
+        .square { position: relative; width: 100%; height: 100%; overflow: hidden; cursor: pointer; }
+        .sq-white { background-color: #eeeed2; }
+        .sq-black { background-color: #769656; }
+        .sq-selected { background-color: #baca44 !important; box-shadow: inset 0 0 20px rgba(0,0,0,0.6); }
+        .king-in-check { background-color: #ff4444 !important; animation: pulse-red 0.8s infinite; }
+        
+        .piece-img {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 2; cursor: grab;
+            pointer-events: none; filter: drop-shadow(0 5px 3px rgba(0,0,0,0.5));
+            animation: dropIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
-        .controls { margin-top: 10px; display: flex; justify-content: center; gap: 15px; }
-        .ctrl-btn { width: 50px; height: 50px; border-radius: 50%; font-size: 20px; background: rgba(255,255,255,0.1); border: 1px solid #00eaff; color: white; }
+        @media (hover: hover) { .square:hover .piece-img { animation: hoverBounce 0.6s ease-in-out infinite; } }
 
-        /* TABLE */
-        table { width: 100%; border-collapse: collapse; }
-        td { padding: 15px; border-bottom: 1px solid #444; }
-        td:first-child { color: #00eaff; font-weight: bold; width: 40%; }
+        .valid-move::after { content: ''; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 25%; height: 25%; background-color: rgba(0, 0, 0, 0.3); border-radius: 50%; }
+        .valid-capture::after { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 6px solid rgba(0, 0, 0, 0.2); border-radius: 50%; box-sizing: border-box; animation: spinTarget 10s linear infinite; }
 
-        footer { text-align: center; padding: 30px; background: #000; margin-top: 40px; font-size: 14px; color: #888; }
+        .chess-sidebar {
+            width: 300px; background: #1e1e1e; padding: 20px; border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5); display: flex; flex-direction: column; gap: 15px;
+        }
+        .graveyard-section { background: #202020; padding: 10px; border-radius: 8px; border: 1px solid #333; }
+        .graveyard-title { font-size: 0.8rem; color: #888; margin-bottom: 5px; text-transform: uppercase; }
+        .graveyard { display: flex; flex-wrap: wrap; gap: 0; min-height: 30px; }
+        .dead-piece-img { width: 30px; height: 30px; filter: grayscale(0.2); animation: dropIn 0.3s; }
+        #chess-status { text-align: center; font-size: 1.2rem; font-weight: bold; color: #baca44; }
 
-        @media (max-width: 768px) {
+        .sidebar-btns { display: flex; gap: 10px; flex-wrap: wrap; }
+        .btn-control { flex: 1; padding: 10px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; }
+        .btn-flip { background: #444; color: white; border: 1px solid #666; }
+        .btn-restart { background: #baca44; color: black; }
+        .btn-menu { background: #333; color: #aaa; border: 1px solid #555; width: 100%; }
+
+        #chess-overlay {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.98); z-index: 2000;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            transition: opacity 0.5s ease-out;
+        }
+        #chess-overlay h1 { font-size: 3.5rem; margin: 0; text-shadow: 0 0 20px #fff; color: white; text-align: center;}
+        .menu-btn { width: 250px; background: #baca44; color: black; padding: 15px; border-radius: 50px; font-size: 1.2rem; margin-bottom: 15px; border: none; cursor: pointer; font-weight: bold; animation: pulse-btn 2s infinite; }
+        .difficulty-btn { width: 200px; background: #333; color: white; padding: 10px; border-radius: 50px; margin-bottom: 10px; border: 1px solid #555; cursor: pointer; }
+        .difficulty-btn:hover { background: #baca44; color: black; }
+        .hidden { display: none; }
+
+        @media (max-width: 900px) {
             nav { flex-direction: column; text-align: center; gap: 15px; }
+            .app-layout { flex-direction: column; align-items: center; }
+            .board-column { width: 100%; max-width: 100%; }
+            .chess-sidebar { width: 100%; flex-direction: row; flex-wrap: wrap; }
+            .graveyard-section { flex: 1; }
             #ttt-board { grid-template-columns: repeat(3, 80px); }
             .ttt-cell { width: 80px; height: 80px; }
             .memory-card { height: 60px; }
         }
+
+        @keyframes dropIn { 0% { transform: translateY(-50%) scale(0.5); opacity: 0; } 100% { transform: translateY(0) scale(1); opacity: 1; } }
+        @keyframes hoverBounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-15%); } }
+        @keyframes pulse-red { 0%, 100% { background-color: #ff4444; } 50% { background-color: #550000; } }
+        @keyframes shake { 10%, 90% { transform: translate3d(-2px, 0, 0) rotateX(5deg); } 20%, 80% { transform: translate3d(4px, 0, 0) rotateX(5deg); } 30%, 50%, 70% { transform: translate3d(-6px, 0, 0) rotateX(5deg); } 40%, 60% { transform: translate3d(6px, 0, 0) rotateX(5deg); } }
+        @keyframes pulse-btn { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
+        .shake-hard { animation: shake 0.4s cubic-bezier(.36,.07,.19,.97) both; }
+
+        #tttModal .game-ui, #memoryModal .game-ui, #snakeModal .game-ui { background: #1e1e1e; padding: 20px; border-radius: 15px; border: 1px solid #00eaff; }
+        
+        /* Other Game Styles */
+        .mode-select { display: flex; gap: 10px; justify-content: center; margin-bottom: 20px; flex-wrap: wrap; }
+        .ttt-cell { cursor: pointer; border: 1px solid #444; color: white; }
+        .ttt-cell.winner { background: rgba(0, 234, 255, 0.3); text-shadow: 0 0 20px #00eaff; }
+        
+        .memory-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin: 20px auto; max-width: 400px; }
+        .memory-card { height: 80px; cursor: pointer; position: relative; transform-style: preserve-3d; transition: transform 0.5s; }
+        .memory-card.flipped { transform: rotateY(180deg); }
+        .front, .back { width: 100%; height: 100%; position: absolute; border-radius: 8px; display: flex; justify-content: center; align-items: center; font-size: 30px; backface-visibility: hidden; border: 1px solid rgba(0,234,255,0.5); }
+        .front { background: rgba(0,0,0,0.8); color: #00eaff; transform: rotateY(180deg); }
+        .back { background: linear-gradient(45deg, #00eaff, #008cff); color: black; font-size: 24px; }
+
+        canvas { background: #000; border: 2px solid #00eaff; box-shadow: 0 0 20px rgba(0,234,255,0.4); display: block; margin: 0 auto; max-width: 100%; }
+        .controls { margin-top: 10px; display: flex; justify-content: center; gap: 15px; }
+        .ctrl-btn { width: 50px; height: 50px; border-radius: 50%; font-size: 20px; background: rgba(255,255,255,0.1); border: 1px solid #00eaff; color: white; }
+
     </style>
 </head>
 
@@ -156,6 +234,7 @@
             <table>
                 <tr><td>Name</td><td>Omm Sairam Mahanta</td></tr>
                 <tr><td>DOB</td><td>20/02/2006</td></tr>
+                <tr><td>Index No</td><td>2201298045</td></tr>
                 <tr><td>Education</td><td>B.Tech (CSE)</td></tr>
                 <tr><td>Skills</td><td>Java, Python, HTML/CSS, Gaming</td></tr>
                 <tr><td>Address</td><td>Tihadiposi, Keonjhar, Odisha</td></tr>
@@ -168,7 +247,14 @@
         <div class="card-container">
             
             <div class="card">
-                <i class="fa-solid fa-chess-board"></i>
+                <i class="fa-solid fa-chess-knight"></i>
+                <h3>Sai's Chess</h3>
+                <p>Pro AI, 3D Graphics & Timer.</p>
+                <button class="btn" onclick="openChess()">Play Now</button>
+            </div>
+
+            <div class="card">
+                <i class="fa-solid fa-gamepad"></i>
                 <h3>Super Tic Tac Toe</h3>
                 <p>Classic game with 3 Difficulty Levels.</p>
                 <button class="btn" onclick="openTTT()">Play Now</button>
@@ -195,9 +281,7 @@
         <div class="card">
             <p style="font-size: 18px;"><b>📞 Phone:</b> 7849025583</p>
             <p style="font-size: 18px;"><b>📧 Email:</b> saimahanta3@gmail.com</p>
-            
             <hr style="border-color: rgba(255,255,255,0.1); margin: 20px 0;">
-            
             <h3>Follow Us</h3>
             <div class="social-bar">
                 <a href="https://www.facebook.com/" target="_blank" class="social-icon"><i class="fab fa-facebook-f"></i></a>
@@ -211,35 +295,92 @@
     <footer>Copyright © 2025 Omm Sairam Mahanta</footer>
 </div>
 
+<div id="chessModal" class="modal">
+    <button onclick="closeChess()" style="position:absolute; top:20px; right:20px; background:red; width:40px; height:40px; border-radius:50%; border:none; color:white; font-size:20px; cursor:pointer; z-index:3000;">X</button>
+
+    <div id="chess-overlay">
+        <h1>SAI'S CHESS</h1>
+        <p style="color:#888; margin-bottom:30px;">Ultimate Edition</p>
+        
+        <div id="chess-main-menu">
+            <button class="menu-btn" onclick="showChessDifficulty()">VS COMPUTER</button>
+            <button class="menu-btn" onclick="startChessFriend()" style="background:#ddd">VS FRIEND</button>
+            <button class="menu-btn" onclick="closeChess()" style="background:#333; color:#888; box-shadow:none;">EXIT PORTFOLIO</button>
+        </div>
+
+        <div id="chess-difficulty-menu" class="hidden" style="display:flex; flex-direction:column; align-items:center;">
+            <button class="difficulty-btn" onclick="startChessAI('normal')" style="border-color:#4a6b2f">NORMAL</button>
+            <button class="difficulty-btn" onclick="startChessAI('moderate')" style="border-color:#baca44">MODERATE</button>
+            <button class="difficulty-btn" onclick="startChessAI('high')" style="border-color:#ff4444">HIGH LEVEL</button>
+            <button class="difficulty-btn" onclick="hideChessDifficulty()" style="background:transparent; border:none; margin-top:10px; color:#888;">&larr; Back</button>
+        </div>
+    </div>
+
+    <div class="app-layout" id="chess-ui">
+        
+        <div class="board-column">
+            <div id="black-bar" class="player-bar">
+                <div class="player-name">Black</div>
+                <div id="timer-black" class="timer-display">00:00</div>
+            </div>
+            <div id="board-wrapper">
+                <div id="chess-board"></div>
+            </div>
+            <div id="white-bar" class="player-bar active-turn">
+                <div class="player-name">White</div>
+                <div id="timer-white" class="timer-display">00:00</div>
+            </div>
+        </div>
+
+        <div class="chess-sidebar">
+            <div id="chess-status">White's Turn</div>
+
+            <div class="graveyard-section">
+                <div class="graveyard-title">Captured (White's Trophies)</div>
+                <div id="grave-white" class="graveyard"></div>
+            </div>
+            <div class="graveyard-section">
+                <div class="graveyard-title">Captured (Black's Trophies)</div>
+                <div id="grave-black" class="graveyard"></div>
+            </div>
+
+            <div class="sidebar-btns">
+                <button onclick="flipBoard()" class="btn-control btn-flip">FLIP BOARD</button>
+                <button onclick="resetChess()" class="btn-control btn-restart">RESTART</button>
+            </div>
+            <button onclick="showChessOverlay()" class="btn-control btn-menu">MENU</button>
+        </div>
+    </div>
+</div>
+
 <div id="tttModal" class="modal">
     <div class="game-ui">
         <h2>Tic Tac Toe</h2>
         <div class="mode-select">
-            <button class="btn" onclick="setDifficulty('easy')">Easy (Basic)</button>
+            <button class="btn" onclick="setDifficulty('easy')">Easy</button>
             <button class="btn" onclick="setDifficulty('medium')">Medium</button>
-            <button class="btn" onclick="setDifficulty('hard')">Hard (AI)</button>
+            <button class="btn" onclick="setDifficulty('hard')">Hard</button>
         </div>
-        <p id="tttStatus" style="color:#00eaff;">Select a difficulty to start</p>
-        <div id="ttt-board"></div>
-        <button class="btn btn-red" onclick="closeModal('tttModal')">Close Game</button>
+        <p id="tttStatus" style="color:#00eaff;">Select Difficulty</p>
+        <div id="ttt-board" style="display:grid; grid-template-columns:repeat(3, 100px); gap:10px; justify-content:center; margin-top:20px;"></div>
+        <button class="btn btn-red" onclick="closeModal('tttModal')" style="margin-top:20px;">Close Game</button>
     </div>
 </div>
 
 <div id="memoryModal" class="modal">
     <div class="game-ui">
         <h2>Memory Game</h2>
-        <p style="color:#aaa;">Flip cards to find matching pairs</p>
         <div class="memory-grid" id="memoryGrid"></div>
         <h3 id="memoryStatus" style="color:#00eaff; height:20px;"></h3>
         <button class="btn" onclick="initMemory()">Restart</button>
-        <button class="btn btn-red" onclick="closeModal('memoryModal')">Close Game</button>
+        <button class="btn btn-red" onclick="closeModal('memoryModal')">Close</button>
     </div>
 </div>
 
 <div id="snakeModal" class="modal">
     <div class="game-ui">
         <h2>Neon Snake</h2>
-        <p>Score: <span id="snakeScore" style="color:#00eaff; font-weight:bold;">0</span> | Twist: Speed Increases!</p>
+        <p>Score: <span id="snakeScore">0</span></p>
         <canvas id="snakeCanvas" width="300" height="300"></canvas>
         <div class="controls">
             <button class="ctrl-btn" onclick="changeDirection('LEFT')">⬅️</button>
@@ -249,14 +390,356 @@
         </div>
         <br>
         <button class="btn" onclick="startSnake()">Restart</button>
-        <button class="btn btn-red" onclick="closeSnake()">Close Game</button>
+        <button class="btn btn-red" onclick="closeSnake()">Close</button>
     </div>
 </div>
 
 <script>
-    // --- GENERAL MODAL FUNCTIONS ---
-    function closeModal(id) {
-        document.getElementById(id).style.display = "none";
+    function closeModal(id) { document.getElementById(id).style.display = "none"; }
+
+    /* ================= CHESS LOGIC ================= */
+    let chessBoard = [], chessTurn = 'white', chessSelected = null, chessActive = false;
+    let chessMode = 'friend', chessAI = 'normal';
+    let timeW = 0, timeB = 0, chessTimer = null;
+
+    const pieces = {
+        'P': 'https://upload.wikimedia.org/wikipedia/commons/4/45/Chess_plt45.svg',
+        'N': 'https://upload.wikimedia.org/wikipedia/commons/7/70/Chess_nlt45.svg',
+        'B': 'https://upload.wikimedia.org/wikipedia/commons/b/b1/Chess_blt45.svg',
+        'R': 'https://upload.wikimedia.org/wikipedia/commons/7/72/Chess_rlt45.svg',
+        'Q': 'https://upload.wikimedia.org/wikipedia/commons/1/15/Chess_qlt45.svg',
+        'K': 'https://upload.wikimedia.org/wikipedia/commons/4/42/Chess_klt45.svg',
+        'p': 'https://upload.wikimedia.org/wikipedia/commons/c/c7/Chess_pdt45.svg',
+        'n': 'https://upload.wikimedia.org/wikipedia/commons/e/ef/Chess_ndt45.svg',
+        'b': 'https://upload.wikimedia.org/wikipedia/commons/9/98/Chess_bdt45.svg',
+        'r': 'https://upload.wikimedia.org/wikipedia/commons/f/ff/Chess_rdt45.svg',
+        'q': 'https://upload.wikimedia.org/wikipedia/commons/4/47/Chess_qdt45.svg',
+        'k': 'https://upload.wikimedia.org/wikipedia/commons/f/f0/Chess_kdt45.svg'
+    };
+
+    const initialChess = [
+        ['r','n','b','q','k','b','n','r'], ['p','p','p','p','p','p','p','p'],
+        ['','','','','','','',''], ['','','','','','','',''],
+        ['','','','','','','',''], ['','','','','','','',''],
+        ['P','P','P','P','P','P','P','P'], ['R','N','B','Q','K','B','N','R']
+    ];
+
+    function openChess() { document.getElementById('chessModal').style.display = 'flex'; showChessOverlay(); }
+    function closeChess() { document.getElementById('chessModal').style.display = 'none'; clearInterval(chessTimer); }
+
+    function showChessDifficulty() { document.getElementById('chess-main-menu').style.display='none'; document.getElementById('chess-difficulty-menu').style.display='flex'; }
+    function hideChessDifficulty() { document.getElementById('chess-main-menu').style.display='flex'; document.getElementById('chess-difficulty-menu').style.display='none'; }
+    
+    function showChessOverlay() {
+        const ov = document.getElementById('chess-overlay');
+        ov.style.display = 'flex'; ov.style.opacity = 1;
+        document.getElementById('chess-ui').style.opacity = 0;
+        hideChessDifficulty();
+        chessActive = false; clearInterval(chessTimer);
+    }
+
+    function startChessFriend() { chessMode = 'friend'; launchChess(); }
+    function startChessAI(level) { chessMode = 'computer'; chessAI = level; launchChess(); }
+
+    function launchChess() {
+        const ov = document.getElementById('chess-overlay');
+        ov.style.opacity = 0;
+        setTimeout(() => { ov.style.display = 'none'; document.getElementById('chess-ui').style.opacity = 1; }, 500);
+        resetChess();
+    }
+
+    function resetChess() {
+        chessBoard = JSON.parse(JSON.stringify(initialChess));
+        chessTurn = 'white'; chessSelected = null; chessActive = true;
+        clearInterval(chessTimer); timeW = 0; timeB = 0; updateChessTimer(); startChessTimer();
+        document.getElementById('grave-white').innerHTML = '';
+        document.getElementById('grave-black').innerHTML = '';
+        document.getElementById('white-bar').classList.add('active-turn');
+        document.getElementById('black-bar').classList.remove('active-turn');
+        document.getElementById('chess-status').innerText = "White's Turn";
+        document.getElementById('board-wrapper').className = '';
+        // Reset Flip
+        document.getElementById('chess-board').classList.remove('flipped-board');
+        document.querySelector('.board-column').classList.remove('flipped-layout');
+        drawChessBoard();
+    }
+
+    /* --- FLIP BOARD + TIMERS --- */
+    function flipBoard() {
+        document.getElementById('chess-board').classList.toggle('flipped-board');
+        // This line flips the order of the Top and Bottom Timers
+        document.querySelector('.board-column').classList.toggle('flipped-layout');
+    }
+
+    function startChessTimer() {
+        if(chessTimer) clearInterval(chessTimer);
+        chessTimer = setInterval(() => {
+            if(!chessActive) return;
+            if(chessTurn === 'white') timeW++; else timeB++;
+            updateChessTimer();
+        }, 1000);
+    }
+    function updateChessTimer() {
+        const fmt = s => `${Math.floor(s/60)}:${(s%60).toString().padStart(2,'0')}`;
+        document.getElementById('timer-white').innerText = fmt(timeW);
+        document.getElementById('timer-black').innerText = fmt(timeB);
+    }
+
+    function drawChessBoard() {
+        const boardDiv = document.getElementById('chess-board');
+        boardDiv.innerHTML = '';
+        const inCheck = isKingInCheck(chessTurn);
+
+        for(let r=0; r<8; r++) {
+            for(let c=0; c<8; c++) {
+                const sq = document.createElement('div');
+                sq.className = `square ${(r+c)%2===0 ? 'sq-white' : 'sq-black'}`;
+                sq.onclick = () => handleChessClick(r, c);
+
+                const p = chessBoard[r][c];
+                if(p) {
+                    const img = document.createElement('img');
+                    img.src = pieces[p]; img.className = 'piece-img';
+                    sq.appendChild(img);
+                    if(inCheck && p.toLowerCase() === 'k' && (p === p.toUpperCase()) === (chessTurn === 'white')) {
+                        sq.classList.add('king-in-check');
+                    }
+                }
+
+                if(chessSelected && chessSelected.r === r && chessSelected.c === c) sq.classList.add('sq-selected');
+                if(chessSelected && chessActive && (chessMode === 'friend' || chessTurn === 'white')) {
+                    if(isMoveLegal(chessSelected.r, chessSelected.c, r, c)) {
+                        sq.classList.add(chessBoard[r][c] ? 'valid-capture' : 'valid-move');
+                    }
+                }
+                boardDiv.appendChild(sq);
+            }
+        }
+    }
+
+    function handleChessClick(r, c) {
+        if(!chessActive) return;
+        if(chessMode === 'computer' && chessTurn === 'black') return;
+
+        const clickedPiece = chessBoard[r][c];
+        const isWhitePiece = clickedPiece && clickedPiece === clickedPiece.toUpperCase();
+
+        if(!chessSelected) {
+            if(!clickedPiece) return;
+            if((chessTurn === 'white' && !isWhitePiece) || (chessTurn === 'black' && isWhitePiece)) return;
+            chessSelected = {r, c}; drawChessBoard();
+        } else {
+            if(chessSelected.r === r && chessSelected.c === c) { chessSelected = null; drawChessBoard(); return; }
+            if(clickedPiece && ((chessTurn === 'white' && isWhitePiece) || (chessTurn === 'black' && !isWhitePiece))) {
+                chessSelected = {r, c}; drawChessBoard(); return;
+            }
+            if(isMoveLegal(chessSelected.r, chessSelected.c, r, c)) {
+                makeChessMove(chessSelected.r, chessSelected.c, r, c);
+            } else {
+                chessSelected = null; drawChessBoard();
+            }
+        }
+    }
+
+    function makeChessMove(r1, c1, r2, c2) {
+        const moving = chessBoard[r1][c1];
+        const target = chessBoard[r2][c2];
+
+        if(target) {
+            const grave = target === target.toUpperCase() ? document.getElementById('grave-white') : document.getElementById('grave-black');
+            const img = document.createElement('img'); img.src = pieces[target]; img.className = 'dead-piece-img';
+            grave.appendChild(img);
+            const wrapper = document.getElementById('board-wrapper');
+            wrapper.classList.remove('shake-hard');
+            void wrapper.offsetWidth; wrapper.classList.add('shake-hard');
+        }
+
+        chessBoard[r2][c2] = moving; chessBoard[r1][c1] = '';
+        chessTurn = chessTurn === 'white' ? 'black' : 'white';
+        
+        if(chessTurn === 'white') {
+            document.getElementById('white-bar').classList.add('active-turn');
+            document.getElementById('black-bar').classList.remove('active-turn');
+            document.getElementById('chess-status').innerText = "White's Turn";
+        } else {
+            document.getElementById('white-bar').classList.remove('active-turn');
+            document.getElementById('black-bar').classList.add('active-turn');
+            document.getElementById('chess-status').innerText = "Black's Turn";
+        }
+
+        const inCheck = isKingInCheck(chessTurn);
+        const hasMoves = hasValidMoves(chessTurn);
+        let gameOver = false;
+
+        if(inCheck) {
+            if(!hasMoves) { endChessGame(chessTurn === 'white' ? 'black' : 'white'); gameOver = true; }
+            else { 
+                document.getElementById('chess-status').innerText = "CHECK!"; 
+                document.getElementById('chess-status').style.color = "#ff4444";
+                document.getElementById('board-wrapper').classList.add('board-check');
+            }
+        } else {
+            document.getElementById('chess-status').style.color = "#baca44";
+            document.getElementById('board-wrapper').classList.remove('board-check');
+            if(!hasMoves) { 
+                document.getElementById('chess-status').innerText = "DRAW (Stalemate)"; 
+                chessActive = false; clearInterval(chessTimer); gameOver = true; 
+            }
+        }
+
+        chessSelected = null; drawChessBoard();
+
+        if(!gameOver && chessActive && chessMode === 'computer' && chessTurn === 'black') {
+            setTimeout(chessAIThink, 500);
+        }
+    }
+
+    function endChessGame(winner) {
+        chessActive = false; clearInterval(chessTimer);
+        document.getElementById('chess-status').innerHTML = `<span style="color:gold">CHECKMATE! ${winner.toUpperCase()} WINS</span>`;
+        alert(`CHECKMATE! ${winner.toUpperCase()} WINS!`);
+    }
+
+    // --- CHESS AI ---
+    function chessAIThink() {
+        let bestMove = null;
+        if(chessAI === 'normal') {
+            const moves = getAllMoves('black');
+            if(moves.length) bestMove = moves[Math.floor(Math.random() * moves.length)];
+        } else if(chessAI === 'moderate') {
+            bestMove = getBestMove(1);
+        } else {
+            bestMove = getBestMove(2);
+        }
+        if(bestMove) makeChessMove(bestMove.r1, bestMove.c1, bestMove.r2, bestMove.c2);
+    }
+
+    const pieceValues = { p: 10, n: 30, b: 30, r: 50, q: 90, k: 900 };
+    function getBestMove(depth) {
+        const moves = getAllMoves('black');
+        let bestScore = -Infinity; let bestMove = moves[0];
+        moves.sort(() => Math.random() - 0.5);
+        for(const move of moves) {
+            const t = chessBoard[move.r2][move.c2];
+            chessBoard[move.r2][move.c2] = chessBoard[move.r1][move.c1]; chessBoard[move.r1][move.c1] = '';
+            const score = minimax(depth - 1, false, -Infinity, Infinity);
+            chessBoard[move.r1][move.c1] = chessBoard[move.r2][move.c2]; chessBoard[move.r2][move.c2] = t;
+            if(score > bestScore) { bestScore = score; bestMove = move; }
+        }
+        return bestMove;
+    }
+
+    function minimax(depth, isMaximizing, alpha, beta) {
+        if(depth === 0) return evaluateBoard();
+        const moves = getAllMoves(isMaximizing ? 'black' : 'white');
+        if(moves.length === 0) return isMaximizing ? -10000 : 10000;
+
+        if(isMaximizing) {
+            let maxEval = -Infinity;
+            for(const move of moves) {
+                const t = chessBoard[move.r2][move.c2];
+                chessBoard[move.r2][move.c2] = chessBoard[move.r1][move.c1]; chessBoard[move.r1][move.c1] = '';
+                const eval = minimax(depth-1, false, alpha, beta);
+                chessBoard[move.r1][move.c1] = chessBoard[move.r2][move.c2]; chessBoard[move.r2][move.c2] = t;
+                maxEval = Math.max(maxEval, eval); alpha = Math.max(alpha, eval);
+                if(beta <= alpha) break;
+            }
+            return maxEval;
+        } else {
+            let minEval = Infinity;
+            for(const move of moves) {
+                const t = chessBoard[move.r2][move.c2];
+                chessBoard[move.r2][move.c2] = chessBoard[move.r1][move.c1]; chessBoard[move.r1][move.c1] = '';
+                const eval = minimax(depth-1, true, alpha, beta);
+                chessBoard[move.r1][move.c1] = chessBoard[move.r2][move.c2]; chessBoard[move.r2][move.c2] = t;
+                minEval = Math.min(minEval, eval); beta = Math.min(beta, eval);
+                if(beta <= alpha) break;
+            }
+            return minEval;
+        }
+    }
+
+    function evaluateBoard() {
+        let score = 0;
+        for(let r=0; r<8; r++) for(let c=0; c<8; c++) {
+            const p = chessBoard[r][c];
+            if(p) {
+                const val = pieceValues[p.toLowerCase()] || 0;
+                score += (p === p.toLowerCase()) ? val : -val;
+            }
+        }
+        return score;
+    }
+
+    function getAllMoves(color) {
+        const moves = [];
+        for(let r=0; r<8; r++) for(let c=0; c<8; c++) {
+            const p = chessBoard[r][c]; if(!p) continue;
+            const isMine = (color === 'white') ? (p === p.toUpperCase()) : (p === p.toLowerCase());
+            if(isMine) {
+                for(let tr=0; tr<8; tr++) for(let tc=0; tc<8; tc++) {
+                    if(isMoveLegal(r, c, tr, tc)) moves.push({r1:r, c1:c, r2:tr, c2:tc});
+                }
+            }
+        }
+        return moves;
+    }
+
+    function isMoveLegal(r1, c1, r2, c2) {
+        if(!isValidGeom(r1, c1, r2, c2, chessBoard)) return false;
+        const t = chessBoard[r2][c2]; const m = chessBoard[r1][c1];
+        chessBoard[r2][c2] = m; chessBoard[r1][c1] = '';
+        const safe = !isKingInCheck((m===m.toUpperCase())?'white':'black');
+        chessBoard[r1][c1] = m; chessBoard[r2][c2] = t;
+        return safe;
+    }
+
+    function isValidGeom(r1, c1, r2, c2, b) {
+        const p = b[r1][c1].toLowerCase();
+        const dx = Math.abs(c2-c1), dy = Math.abs(r2-r1);
+        if(b[r2][c2]) { if((b[r1][c1]===b[r1][c1].toUpperCase()) === (b[r2][c2]===b[r2][c2].toUpperCase())) return false; }
+        if(p==='p') {
+            const isW = b[r1][c1]==='P';
+            const dir = isW ? -1 : 1; const start = isW ? 6 : 1;
+            if(c1===c2 && r2===r1+dir && !b[r2][c2]) return true;
+            if(c1===c2 && r2===r1+dir*2 && r1===start && !b[r2][c2] && !b[r1+dir][c1]) return true;
+            if(Math.abs(c1-c2)===1 && r2===r1+dir && b[r2][c2]) return true;
+            return false;
+        }
+        if(p==='r') return (r1===r2||c1===c2) && clearPath(r1,c1,r2,c2,b);
+        if(p==='b') return (dx===dy) && clearPath(r1,c1,r2,c2,b);
+        if(p==='q') return (r1===r2||c1===c2||dx===dy) && clearPath(r1,c1,r2,c2,b);
+        if(p==='n') return (dx===2&&dy===1)||(dx===1&&dy===2);
+        if(p==='k') return dx<=1 && dy<=1;
+        return false;
+    }
+
+    function clearPath(r1, c1, r2, c2, b) {
+        const rd = Math.sign(r2-r1), cd = Math.sign(c2-c1);
+        let r=r1+rd, c=c1+cd;
+        while(r!==r2 || c!==c2) { if(b[r][c]) return false; r+=rd; c+=cd; }
+        return true;
+    }
+
+    function isKingInCheck(color) {
+        let kR, kC; const kChar = color==='white'?'K':'k';
+        for(let r=0; r<8; r++) for(let c=0; c<8; c++) if(chessBoard[r][c]===kChar) {kR=r; kC=c;}
+        if(kR===undefined) return true;
+        for(let r=0; r<8; r++) for(let c=0; c<8; c++) {
+            if(!chessBoard[r][c]) continue;
+            const isEnemy = (color==='white') ? (chessBoard[r][c]===chessBoard[r][c].toLowerCase()) : (chessBoard[r][c]===chessBoard[r][c].toUpperCase());
+            if(isEnemy && isValidGeom(r,c,kR,kC,chessBoard)) return true;
+        }
+        return false;
+    }
+
+    function hasValidMoves(color) {
+        for(let r=0; r<8; r++) for(let c=0; c<8; c++) {
+            const p = chessBoard[r][c]; if(!p) continue;
+            const isMine = (color==='white') ? (p===p.toUpperCase()) : (p===p.toLowerCase());
+            if(isMine) for(let tr=0; tr<8; tr++) for(let tc=0; tc<8; tc++) if (isMoveLegal(r,c,tr,tc)) return true;
+        }
+        return false;
     }
 
     /* ================= TIC TAC TOE LOGIC ================= */
@@ -285,6 +768,8 @@
         tttBoard.forEach((val, i) => {
             const cell = document.createElement("div");
             cell.className = "ttt-cell " + (val ? "winner" : "");
+            cell.style.width = "100px"; cell.style.height = "100px"; cell.style.background = "rgba(255,255,255,0.1)";
+            cell.style.border = "1px solid #444"; cell.style.display = "flex"; cell.style.justifyContent = "center"; cell.style.alignItems = "center"; cell.style.fontSize = "45px";
             cell.innerText = val;
             cell.onclick = () => tttMove(i);
             boardDiv.appendChild(cell);
@@ -302,7 +787,7 @@
             let moveIndex;
             if (tttDifficulty === 'easy') moveIndex = getRandomMove();
             else if (tttDifficulty === 'medium') moveIndex = getMediumMove();
-            else moveIndex = getBestMove(); // Hard
+            else moveIndex = getBestMoveTTT(); // Hard
             
             tttBoard[moveIndex] = tttAi;
             renderTTT();
@@ -317,33 +802,17 @@
     }
 
     function getMediumMove() {
-        // 1. Try to win
-        for(let i=0; i<9; i++) {
-            if(tttBoard[i] == "") {
-                tttBoard[i] = tttAi;
-                if(checkTTTWin(tttAi)) { tttBoard[i] = ""; return i; }
-                tttBoard[i] = "";
-            }
-        }
-        // 2. Block human
-        for(let i=0; i<9; i++) {
-            if(tttBoard[i] == "") {
-                tttBoard[i] = tttHuman;
-                if(checkTTTWin(tttHuman)) { tttBoard[i] = ""; return i; }
-                tttBoard[i] = "";
-            }
-        }
+        for(let i=0; i<9; i++) { if(tttBoard[i] == "") { tttBoard[i] = tttAi; if(checkTTTWin(tttAi)) { tttBoard[i] = ""; return i; } tttBoard[i] = ""; } }
+        for(let i=0; i<9; i++) { if(tttBoard[i] == "") { tttBoard[i] = tttHuman; if(checkTTTWin(tttHuman)) { tttBoard[i] = ""; return i; } tttBoard[i] = ""; } }
         return getRandomMove();
     }
 
-    function getBestMove() {
-        // Minimax implementation (Simplified call)
-        let bestScore = -Infinity;
-        let move;
+    function getBestMoveTTT() {
+        let bestScore = -Infinity; let move;
         for(let i=0; i<9; i++) {
             if(tttBoard[i] === "") {
                 tttBoard[i] = tttAi;
-                let score = minimax(tttBoard, 0, false);
+                let score = minimaxTTT(tttBoard, 0, false);
                 tttBoard[i] = "";
                 if(score > bestScore) { bestScore = score; move = i; }
             }
@@ -351,7 +820,7 @@
         return move;
     }
 
-    function minimax(board, depth, isMaximizing) {
+    function minimaxTTT(board, depth, isMaximizing) {
         if(checkTTTWin(tttAi)) return 10 - depth;
         if(checkTTTWin(tttHuman)) return depth - 10;
         if(!board.includes("")) return 0;
@@ -361,7 +830,7 @@
             for(let i=0; i<9; i++) {
                 if(board[i] === "") {
                     board[i] = tttAi;
-                    let score = minimax(board, depth + 1, false);
+                    let score = minimaxTTT(board, depth + 1, false);
                     board[i] = "";
                     bestScore = Math.max(score, bestScore);
                 }
@@ -372,7 +841,7 @@
             for(let i=0; i<9; i++) {
                 if(board[i] === "") {
                     board[i] = tttHuman;
-                    let score = minimax(board, depth + 1, true);
+                    let score = minimaxTTT(board, depth + 1, true);
                     board[i] = "";
                     bestScore = Math.min(score, bestScore);
                 }
@@ -394,10 +863,7 @@
     let firstCard = null, secondCard = null;
     let lockBoard = false;
 
-    function openMemory() {
-        document.getElementById("memoryModal").style.display = "flex";
-        initMemory();
-    }
+    function openMemory() { document.getElementById("memoryModal").style.display = "flex"; initMemory(); }
 
     function initMemory() {
         const grid = document.getElementById("memoryGrid");
@@ -420,21 +886,14 @@
         if (lockBoard || this === firstCard || this.classList.contains("flipped")) return;
         this.classList.add("flipped");
 
-        if (!firstCard) {
-            firstCard = this;
-            return;
-        }
+        if (!firstCard) { firstCard = this; return; }
         secondCard = this;
         checkMatch();
     }
 
     function checkMatch() {
         let isMatch = firstCard.dataset.icon === secondCard.dataset.icon;
-        if (isMatch) {
-            disableCards();
-        } else {
-            unflipCards();
-        }
+        if (isMatch) { disableCards(); } else { unflipCards(); }
     }
 
     function disableCards() {
@@ -460,14 +919,8 @@
     let snake, food, direction, gameLoop, score;
     let speed = 200;
 
-    function openSnake() {
-        document.getElementById("snakeModal").style.display = "flex";
-        startSnake();
-    }
-    function closeSnake() {
-        clearInterval(gameLoop);
-        document.getElementById("snakeModal").style.display = "none";
-    }
+    function openSnake() { document.getElementById("snakeModal").style.display = "flex"; startSnake(); }
+    function closeSnake() { clearInterval(gameLoop); document.getElementById("snakeModal").style.display = "none"; }
 
     function startSnake() {
         snake = [{x: 10, y: 10}];
@@ -481,49 +934,29 @@
     }
 
     function drawSnake() {
-        // Clear screen
-        ctx.fillStyle = "#000";
-        ctx.fillRect(0, 0, 300, 300);
+        ctx.fillStyle = "#000"; ctx.fillRect(0, 0, 300, 300);
+        ctx.fillStyle = "#ff0000"; ctx.shadowBlur = 15; ctx.shadowColor = "red"; ctx.fillRect(food.x * 15, food.y * 15, 15, 15);
 
-        // Draw Food
-        ctx.fillStyle = "#ff0000";
-        ctx.shadowBlur = 15; ctx.shadowColor = "red";
-        ctx.fillRect(food.x * 15, food.y * 15, 15, 15);
-
-        // Move Snake
         let head = {x: snake[0].x, y: snake[0].y};
         if(direction === "LEFT") head.x--;
         if(direction === "UP") head.y--;
         if(direction === "RIGHT") head.x++;
         if(direction === "DOWN") head.y++;
 
-        // Walls Collision
         if(head.x < 0 || head.x >= 20 || head.y < 0 || head.y >= 20 || snake.some(s => s.x === head.x && s.y === head.y)) {
-            clearInterval(gameLoop);
-            alert("Game Over! Score: " + score);
-            return;
+            clearInterval(gameLoop); alert("Game Over! Score: " + score); return;
         }
 
         snake.unshift(head);
 
-        // Eat Food
         if(head.x === food.x && head.y === food.y) {
             score += 10;
             document.getElementById("snakeScore").innerText = score;
             food = {x: Math.floor(Math.random()*20), y: Math.floor(Math.random()*20)};
-            // TWIST: Increase Speed
-            if(speed > 50) {
-                clearInterval(gameLoop);
-                speed -= 5;
-                gameLoop = setInterval(drawSnake, speed);
-            }
-        } else {
-            snake.pop();
-        }
+            if(speed > 50) { clearInterval(gameLoop); speed -= 5; gameLoop = setInterval(drawSnake, speed); }
+        } else { snake.pop(); }
 
-        // Draw Snake Body
-        ctx.fillStyle = "#00eaff";
-        ctx.shadowBlur = 10; ctx.shadowColor = "cyan";
+        ctx.fillStyle = "#00eaff"; ctx.shadowBlur = 10; ctx.shadowColor = "cyan";
         snake.forEach(part => ctx.fillRect(part.x * 15, part.y * 15, 13, 13));
         ctx.shadowBlur = 0;
     }
