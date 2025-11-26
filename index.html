@@ -99,7 +99,7 @@
         }
         .board-column { display: flex; flex-direction: column; align-items: center; gap: 15px; width: 100%; max-width: 500px; }
 
-        /* THIS CLASS SWAPS THE TIMERS */
+        /* This class flips the layout order for the timer */
         .flipped-layout { flex-direction: column-reverse; }
 
         .player-bar {
@@ -122,7 +122,6 @@
             transition: transform 0.5s ease;
         }
         
-        /* FLIP CLASSES */
         .flipped-board { transform: rotate(180deg) !important; }
         .flipped-board .square { transform: rotate(180deg) !important; }
 
@@ -158,6 +157,7 @@
         .btn-restart { background: #baca44; color: black; }
         .btn-menu { background: #333; color: #aaa; border: 1px solid #555; width: 100%; }
 
+        /* --- FIXED CHESS OVERLAY (RESPONSIVE BUTTONS) --- */
         #chess-overlay {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.98); z-index: 2000;
@@ -165,7 +165,24 @@
             transition: opacity 0.5s ease-out;
         }
         #chess-overlay h1 { font-size: 3.5rem; margin: 0; text-shadow: 0 0 20px #fff; color: white; text-align: center;}
-        .menu-btn { width: 250px; background: #baca44; color: black; padding: 15px; border-radius: 50px; font-size: 1.2rem; margin-bottom: 15px; border: none; cursor: pointer; font-weight: bold; animation: pulse-btn 2s infinite; }
+        
+        /* THE FIX: Flex Column for Menu Buttons */
+        #chess-main-menu {
+            display: flex;
+            flex-direction: column; /* Forces stack */
+            align-items: center;
+            width: 100%;
+            gap: 15px;
+        }
+
+        .menu-btn { 
+            width: 80%; /* Responsive width */
+            max-width: 300px; 
+            background: #baca44; color: black; padding: 15px; border-radius: 50px; 
+            font-size: 1.2rem; border: none; cursor: pointer; font-weight: bold; 
+            animation: pulse-btn 2s infinite; 
+        }
+        
         .difficulty-btn { width: 200px; background: #333; color: white; padding: 10px; border-radius: 50px; margin-bottom: 10px; border: 1px solid #555; cursor: pointer; }
         .difficulty-btn:hover { background: #baca44; color: black; }
         .hidden { display: none; }
@@ -188,13 +205,16 @@
         @keyframes pulse-btn { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
         .shake-hard { animation: shake 0.4s cubic-bezier(.36,.07,.19,.97) both; }
 
-        #tttModal .game-ui, #memoryModal .game-ui, #snakeModal .game-ui { background: #1e1e1e; padding: 20px; border-radius: 15px; border: 1px solid #00eaff; }
-        
-        /* Other Game Styles */
+        /* Specific Modal Overrides */
+        #tttModal .game-ui, #memoryModal .game-ui, #snakeModal .game-ui {
+            background: #1e1e1e; padding: 20px; border-radius: 15px; border: 1px solid #00eaff;
+        }
+        /* Tic Tac Toe */
         .mode-select { display: flex; gap: 10px; justify-content: center; margin-bottom: 20px; flex-wrap: wrap; }
         .ttt-cell { cursor: pointer; border: 1px solid #444; color: white; }
         .ttt-cell.winner { background: rgba(0, 234, 255, 0.3); text-shadow: 0 0 20px #00eaff; }
         
+        /* Memory */
         .memory-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin: 20px auto; max-width: 400px; }
         .memory-card { height: 80px; cursor: pointer; position: relative; transform-style: preserve-3d; transition: transform 0.5s; }
         .memory-card.flipped { transform: rotateY(180deg); }
@@ -202,6 +222,7 @@
         .front { background: rgba(0,0,0,0.8); color: #00eaff; transform: rotateY(180deg); }
         .back { background: linear-gradient(45deg, #00eaff, #008cff); color: black; font-size: 24px; }
 
+        /* Snake */
         canvas { background: #000; border: 2px solid #00eaff; box-shadow: 0 0 20px rgba(0,234,255,0.4); display: block; margin: 0 auto; max-width: 100%; }
         .controls { margin-top: 10px; display: flex; justify-content: center; gap: 15px; }
         .ctrl-btn { width: 50px; height: 50px; border-radius: 50%; font-size: 20px; background: rgba(255,255,255,0.1); border: 1px solid #00eaff; color: white; }
