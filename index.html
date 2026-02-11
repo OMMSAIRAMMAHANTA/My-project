@@ -15,8 +15,29 @@
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             color: #fff;
             user-select: none;
+            overflow-x: hidden; /* Prevent horizontal scroll from canvas */
         }
-        .overlay { background: rgba(0,0,0,0.60); width: 100%; min-height: 100vh; padding-bottom: 50px; }
+
+        /* --- REPTILE CANVAS (Background Layer) --- */
+        #reptileCanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1; /* Sits above background image */
+            pointer-events: none; /* Allows clicking through to content */
+        }
+
+        /* --- CONTENT OVERLAY (Foreground Layer) --- */
+        .overlay { 
+            background: rgba(0,0,0,0.65); /* Darken bg slightly for contrast */
+            width: 100%; 
+            min-height: 100vh; 
+            padding-bottom: 50px;
+            position: relative;
+            z-index: 2; /* Sits above reptile */
+        }
 
         /* NAVBAR */
         nav {
@@ -39,6 +60,7 @@
             color: #000; border-radius: 30px; border: none;
             font-weight: bold; cursor: pointer; transition: 0.3s;
             box-shadow: 0 0 15px rgba(0, 234, 255, 0.5);
+            text-decoration: none; display: inline-block;
         }
         .btn:hover { transform: scale(1.05); box-shadow: 0 0 25px rgba(0, 234, 255, 0.8); }
         .btn-red { background: linear-gradient(45deg, #ff4d4d, #c0392b); box-shadow: 0 0 15px rgba(255, 77, 77, 0.5); color: white; }
@@ -50,6 +72,7 @@
         .card {
             background: rgba(0,0,0,0.7); padding: 25px; border-radius: 15px;
             border: 1px solid rgba(255,255,255,0.1); text-align: center; transition: 0.3s;
+            backdrop-filter: blur(5px); /* Glass effect */
         }
         .card:hover { transform: translateY(-10px); border-color: #00eaff; box-shadow: 0 0 20px rgba(0,234,255,0.2); }
         .card i { font-size: 40px; margin-bottom: 10px; color: #00eaff; }
@@ -57,9 +80,8 @@
         /* BIODATA TABLE */
         table { width: 100%; border-collapse: collapse; margin-top: 10px; }
         td { padding: 12px 15px; border-bottom: 1px solid rgba(255, 255, 255, 0.1); font-size: 1.1rem; }
-        
         td:first-child { 
-            color: #00eaff; font-weight: bold; width: 35%; 
+            color: #00eaff; font-weight: bold; width: 30%; 
             text-align: right; border-right: 2px solid rgba(0, 234, 255, 0.3); padding-right: 20px; 
         }
         td:last-child { text-align: left; padding-left: 20px; color: #eee; }
@@ -75,31 +97,39 @@
             display: flex; justify-content: center; align-items: center;
             text-decoration: none; color: white; font-size: 24px; transition: 0.3s; border: 2px solid #00eaff;
         }
-        .social-icon:hover { transform: translateY(-5px); color: #fff; }
+        .social-icon:hover { transform: translateY(-5px); color: #fff; background: #00eaff; }
 
         footer { text-align: center; padding: 30px; background: #000; margin-top: 40px; font-size: 14px; color: #888; }
 
-        /* --- MODALS --- */
+        /* --- MODALS & GAMES --- */
         .modal {
-            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            display: none; 
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0, 0, 0, 0.95); z-index: 2000;
-            justify-content: center; align-items: center; flex-direction: column;
-            overflow-y: auto;
+            align-items: center; flex-direction: column;
+            overflow-y: auto; padding: 20px 0;
         }
+        
+        .game-ui, .app-layout, #chess-overlay { margin: auto 0; flex-shrink: 0; }
         .game-ui { text-align: center; animation: fadeIn 0.5s ease; width: 90%; max-width: 500px; }
         @keyframes fadeIn { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
 
-        /* --- CHESS STYLES --- */
-        #chessModal { background: #111; font-family: 'Segoe UI', system-ui, sans-serif; }
-        .chess-wrapper { width: 100%; max-width: 1100px; display: flex; justify-content: center; }
-        
+        /* CHESS STYLES */
+        #chessModal { background: #111; }
+        .close-btn-fixed {
+            position: fixed; top: 15px; right: 15px; 
+            background: #ff4444; width: 40px; height: 40px; 
+            border-radius: 50%; border: 2px solid #fff; color: white; 
+            font-weight: bold; font-size: 18px; cursor: pointer; 
+            z-index: 3000; box-shadow: 0 2px 10px rgba(0,0,0,0.5);
+            display: flex; align-items: center; justify-content: center;
+        }
+
         .app-layout {
             display: flex; flex-direction: row; align-items: flex-start; justify-content: center;
-            gap: 30px; width: 100%; perspective: 1000px; opacity: 0; transition: opacity 1s;
+            gap: 30px; width: 100%; max-width:1100px; opacity: 0; transition: opacity 1s;
         }
         .board-column { display: flex; flex-direction: column; align-items: center; gap: 15px; width: 100%; max-width: 500px; }
-
-        /* This class flips the layout order for the timer */
         .flipped-layout { flex-direction: column-reverse; }
 
         .player-bar {
@@ -110,17 +140,9 @@
         .timer-display { font-family: monospace; font-size: 1.5rem; font-weight: bold; color: #fff; }
         .active-turn { border-color: #baca44; background: #2a2a2a; box-shadow: 0 0 20px rgba(186, 202, 68, 0.2); transform: scale(1.02); }
         .active-turn .timer-display { color: #baca44; }
-        .active-turn .player-name { color: #fff; }
 
-        #board-wrapper {
-            position: relative; width: 100%; aspect-ratio: 1 / 1;
-            transform: rotateX(5deg); transition: transform 0.3s; box-shadow: 0 30px 60px rgba(0,0,0,0.8);
-        }
-        #chess-board {
-            width: 100%; height: 100%; display: grid; grid-template-columns: repeat(8, 1fr);
-            grid-template-rows: repeat(8, 1fr); border: 8px solid #444; border-radius: 4px; background: #000;
-            transition: transform 0.5s ease;
-        }
+        #board-wrapper { position: relative; width: 100%; aspect-ratio: 1 / 1; transform: rotateX(5deg); transition: transform 0.3s; box-shadow: 0 30px 60px rgba(0,0,0,0.8); }
+        #chess-board { width: 100%; height: 100%; display: grid; grid-template-columns: repeat(8, 1fr); grid-template-rows: repeat(8, 1fr); border: 8px solid #444; border-radius: 4px; background: #000; transition: transform 0.5s ease; }
         
         .flipped-board { transform: rotate(180deg) !important; }
         .flipped-board .square { transform: rotate(180deg) !important; }
@@ -131,22 +153,12 @@
         .sq-selected { background-color: #baca44 !important; box-shadow: inset 0 0 20px rgba(0,0,0,0.6); }
         .king-in-check { background-color: #ff4444 !important; animation: pulse-red 0.8s infinite; }
         
-        .piece-img {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 2; cursor: grab;
-            pointer-events: none; filter: drop-shadow(0 5px 3px rgba(0,0,0,0.5));
-            animation: dropIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
-        @media (hover: hover) { .square:hover .piece-img { animation: hoverBounce 0.6s ease-in-out infinite; } }
-
+        .piece-img { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 2; pointer-events: none; filter: drop-shadow(0 5px 3px rgba(0,0,0,0.5)); animation: dropIn 0.4s; }
         .valid-move::after { content: ''; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 25%; height: 25%; background-color: rgba(0, 0, 0, 0.3); border-radius: 50%; }
-        .valid-capture::after { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 6px solid rgba(0, 0, 0, 0.2); border-radius: 50%; box-sizing: border-box; animation: spinTarget 10s linear infinite; }
+        .valid-capture::after { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 6px solid rgba(0, 0, 0, 0.2); border-radius: 50%; box-sizing: border-box; }
 
-        .chess-sidebar {
-            width: 300px; background: #1e1e1e; padding: 20px; border-radius: 12px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5); display: flex; flex-direction: column; gap: 15px;
-        }
+        .chess-sidebar { width: 300px; background: #1e1e1e; padding: 20px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); display: flex; flex-direction: column; gap: 15px; }
         .graveyard-section { background: #202020; padding: 10px; border-radius: 8px; border: 1px solid #333; }
-        .graveyard-title { font-size: 0.8rem; color: #888; margin-bottom: 5px; text-transform: uppercase; }
         .graveyard { display: flex; flex-wrap: wrap; gap: 0; min-height: 30px; }
         .dead-piece-img { width: 30px; height: 30px; filter: grayscale(0.2); animation: dropIn 0.3s; }
         #chess-status { text-align: center; font-size: 1.2rem; font-weight: bold; color: #baca44; }
@@ -157,64 +169,33 @@
         .btn-restart { background: #baca44; color: black; }
         .btn-menu { background: #333; color: #aaa; border: 1px solid #555; width: 100%; }
 
-        /* --- FIXED CHESS OVERLAY (RESPONSIVE BUTTONS) --- */
-        #chess-overlay {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.98); z-index: 2000;
-            display: flex; flex-direction: column; justify-content: center; align-items: center;
-            transition: opacity 0.5s ease-out;
-        }
+        /* Chess Overlay */
+        #chess-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.98); z-index: 2000; display: flex; flex-direction: column; justify-content: center; align-items: center; transition: opacity 0.5s ease-out; }
         #chess-overlay h1 { font-size: 3.5rem; margin: 0; text-shadow: 0 0 20px #fff; color: white; text-align: center;}
-        
-        /* THE FIX: Flex Column for Menu Buttons */
-        #chess-main-menu {
-            display: flex;
-            flex-direction: column; /* Forces stack */
-            align-items: center;
-            width: 100%;
-            gap: 15px;
-        }
-
-        .menu-btn { 
-            width: 80%; /* Responsive width */
-            max-width: 300px; 
-            background: #baca44; color: black; padding: 15px; border-radius: 50px; 
-            font-size: 1.2rem; border: none; cursor: pointer; font-weight: bold; 
-            animation: pulse-btn 2s infinite; 
-        }
-        
+        #chess-main-menu { display: flex; flex-direction: column; align-items: center; width: 100%; gap: 15px; }
+        .menu-btn { width: 80%; max-width: 300px; background: #baca44; color: black; padding: 15px; border-radius: 50px; font-size: 1.2rem; border: none; cursor: pointer; font-weight: bold; animation: pulse-btn 2s infinite; }
         .difficulty-btn { width: 200px; background: #333; color: white; padding: 10px; border-radius: 50px; margin-bottom: 10px; border: 1px solid #555; cursor: pointer; }
-        .difficulty-btn:hover { background: #baca44; color: black; }
         .hidden { display: none; }
 
+        /* Mobile Fixes */
         @media (max-width: 900px) {
             nav { flex-direction: column; text-align: center; gap: 15px; }
-            .app-layout { flex-direction: column; align-items: center; }
+            .app-layout { flex-direction: column; align-items: center; padding-top: 60px; }
             .board-column { width: 100%; max-width: 100%; }
             .chess-sidebar { width: 100%; flex-direction: row; flex-wrap: wrap; }
             .graveyard-section { flex: 1; }
-            #ttt-board { grid-template-columns: repeat(3, 80px); }
-            .ttt-cell { width: 80px; height: 80px; }
-            .memory-card { height: 60px; }
         }
 
         @keyframes dropIn { 0% { transform: translateY(-50%) scale(0.5); opacity: 0; } 100% { transform: translateY(0) scale(1); opacity: 1; } }
-        @keyframes hoverBounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-15%); } }
         @keyframes pulse-red { 0%, 100% { background-color: #ff4444; } 50% { background-color: #550000; } }
-        @keyframes shake { 10%, 90% { transform: translate3d(-2px, 0, 0) rotateX(5deg); } 20%, 80% { transform: translate3d(4px, 0, 0) rotateX(5deg); } 30%, 50%, 70% { transform: translate3d(-6px, 0, 0) rotateX(5deg); } 40%, 60% { transform: translate3d(6px, 0, 0) rotateX(5deg); } }
         @keyframes pulse-btn { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
-        .shake-hard { animation: shake 0.4s cubic-bezier(.36,.07,.19,.97) both; }
 
-        /* Specific Modal Overrides */
-        #tttModal .game-ui, #memoryModal .game-ui, #snakeModal .game-ui {
-            background: #1e1e1e; padding: 20px; border-radius: 15px; border: 1px solid #00eaff;
-        }
-        /* Tic Tac Toe */
+        /* Other Games */
+        #tttModal .game-ui, #memoryModal .game-ui, #snakeModal .game-ui { background: #1e1e1e; padding: 20px; border-radius: 15px; border: 1px solid #00eaff; }
         .mode-select { display: flex; gap: 10px; justify-content: center; margin-bottom: 20px; flex-wrap: wrap; }
         .ttt-cell { cursor: pointer; border: 1px solid #444; color: white; }
         .ttt-cell.winner { background: rgba(0, 234, 255, 0.3); text-shadow: 0 0 20px #00eaff; }
         
-        /* Memory */
         .memory-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin: 20px auto; max-width: 400px; }
         .memory-card { height: 80px; cursor: pointer; position: relative; transform-style: preserve-3d; transition: transform 0.5s; }
         .memory-card.flipped { transform: rotateY(180deg); }
@@ -222,8 +203,7 @@
         .front { background: rgba(0,0,0,0.8); color: #00eaff; transform: rotateY(180deg); }
         .back { background: linear-gradient(45deg, #00eaff, #008cff); color: black; font-size: 24px; }
 
-        /* Snake */
-        canvas { background: #000; border: 2px solid #00eaff; box-shadow: 0 0 20px rgba(0,234,255,0.4); display: block; margin: 0 auto; max-width: 100%; }
+        canvas#snakeCanvas { background: #000; border: 2px solid #00eaff; box-shadow: 0 0 20px rgba(0,234,255,0.4); display: block; margin: 0 auto; max-width: 100%; }
         .controls { margin-top: 10px; display: flex; justify-content: center; gap: 15px; }
         .ctrl-btn { width: 50px; height: 50px; border-radius: 50%; font-size: 20px; background: rgba(255,255,255,0.1); border: 1px solid #00eaff; color: white; }
 
@@ -231,6 +211,10 @@
 </head>
 
 <body>
+
+<!-- THE REPTILE CURSOR CANVAS -->
+<canvas id="reptileCanvas"></canvas>
+
 <div class="overlay">
 
     <nav>
@@ -255,8 +239,7 @@
             <table>
                 <tr><td>Name</td><td>Omm Sairam Mahanta</td></tr>
                 <tr><td>DOB</td><td>20/02/2006</td></tr>
-                <tr><td>Index No</td><td>2201298045</td></tr>
-                <tr><td>Education</td><td>B.Tech (CSE)</td></tr>
+                <tr><td>Education</td><td>B.Tech (CSE-AI)</td></tr>
                 <tr><td>Skills</td><td>Java, Python, HTML/CSS, Gaming</td></tr>
                 <tr><td>Address</td><td>Tihadiposi, Keonjhar, Odisha</td></tr>
             </table>
@@ -307,7 +290,7 @@
             <div class="social-bar">
                 <a href="https://www.facebook.com/" target="_blank" class="social-icon"><i class="fab fa-facebook-f"></i></a>
                 <a href="https://twitter.com" target="_blank" class="social-icon"><i class="fa-brands fa-x-twitter"></i></a>
-                <a href="https://www.youtube.com/@three_brothers426" target="_blank" class="social-icon"><i class="fab fa-youtube"></i></a>
+                <a href="https://www.youtube.com/@ThePiccX" target="_blank" class="social-icon"><i class="fab fa-youtube"></i></a>
                 <a href="https://www.instagram.com/s_ensei_426" target="_blank" class="social-icon"><i class="fab fa-instagram"></i></a>
             </div>
         </div>
@@ -316,19 +299,17 @@
     <footer>Copyright © 2025 Omm Sairam Mahanta</footer>
 </div>
 
+<!-- CHESS MODAL -->
 <div id="chessModal" class="modal">
-    <button onclick="closeChess()" style="position:absolute; top:20px; right:20px; background:red; width:40px; height:40px; border-radius:50%; border:none; color:white; font-size:20px; cursor:pointer; z-index:3000;">X</button>
-
+    <button onclick="closeChess()" class="close-btn-fixed">X</button>
     <div id="chess-overlay">
         <h1>SAI'S CHESS</h1>
         <p style="color:#888; margin-bottom:30px;">Ultimate Edition</p>
-        
         <div id="chess-main-menu">
             <button class="menu-btn" onclick="showChessDifficulty()">VS COMPUTER</button>
             <button class="menu-btn" onclick="startChessFriend()" style="background:#ddd">VS FRIEND</button>
             <button class="menu-btn" onclick="closeChess()" style="background:#333; color:#888; box-shadow:none;">EXIT PORTFOLIO</button>
         </div>
-
         <div id="chess-difficulty-menu" class="hidden" style="display:flex; flex-direction:column; align-items:center;">
             <button class="difficulty-btn" onclick="startChessAI('normal')" style="border-color:#4a6b2f">NORMAL</button>
             <button class="difficulty-btn" onclick="startChessAI('moderate')" style="border-color:#baca44">MODERATE</button>
@@ -336,9 +317,7 @@
             <button class="difficulty-btn" onclick="hideChessDifficulty()" style="background:transparent; border:none; margin-top:10px; color:#888;">&larr; Back</button>
         </div>
     </div>
-
     <div class="app-layout" id="chess-ui">
-        
         <div class="board-column">
             <div id="black-bar" class="player-bar">
                 <div class="player-name">Black</div>
@@ -352,10 +331,8 @@
                 <div id="timer-white" class="timer-display">00:00</div>
             </div>
         </div>
-
         <div class="chess-sidebar">
             <div id="chess-status">White's Turn</div>
-
             <div class="graveyard-section">
                 <div class="graveyard-title">Captured (White's Trophies)</div>
                 <div id="grave-white" class="graveyard"></div>
@@ -364,7 +341,6 @@
                 <div class="graveyard-title">Captured (Black's Trophies)</div>
                 <div id="grave-black" class="graveyard"></div>
             </div>
-
             <div class="sidebar-btns">
                 <button onclick="flipBoard()" class="btn-control btn-flip">FLIP BOARD</button>
                 <button onclick="resetChess()" class="btn-control btn-restart">RESTART</button>
@@ -374,6 +350,7 @@
     </div>
 </div>
 
+<!-- TIC TAC TOE MODAL -->
 <div id="tttModal" class="modal">
     <div class="game-ui">
         <h2>Tic Tac Toe</h2>
@@ -388,6 +365,7 @@
     </div>
 </div>
 
+<!-- MEMORY GAME MODAL -->
 <div id="memoryModal" class="modal">
     <div class="game-ui">
         <h2>Memory Game</h2>
@@ -398,6 +376,7 @@
     </div>
 </div>
 
+<!-- SNAKE GAME MODAL -->
 <div id="snakeModal" class="modal">
     <div class="game-ui">
         <h2>Neon Snake</h2>
@@ -479,16 +458,17 @@
         document.getElementById('black-bar').classList.remove('active-turn');
         document.getElementById('chess-status').innerText = "White's Turn";
         document.getElementById('board-wrapper').className = '';
+        
         // Reset Flip
         document.getElementById('chess-board').classList.remove('flipped-board');
         document.querySelector('.board-column').classList.remove('flipped-layout');
+        
         drawChessBoard();
     }
 
     /* --- FLIP BOARD + TIMERS --- */
     function flipBoard() {
         document.getElementById('chess-board').classList.toggle('flipped-board');
-        // This line flips the order of the Top and Bottom Timers
         document.querySelector('.board-column').classList.toggle('flipped-layout');
     }
 
@@ -570,9 +550,6 @@
             const grave = target === target.toUpperCase() ? document.getElementById('grave-white') : document.getElementById('grave-black');
             const img = document.createElement('img'); img.src = pieces[target]; img.className = 'dead-piece-img';
             grave.appendChild(img);
-            const wrapper = document.getElementById('board-wrapper');
-            wrapper.classList.remove('shake-hard');
-            void wrapper.offsetWidth; wrapper.classList.add('shake-hard');
         }
 
         chessBoard[r2][c2] = moving; chessBoard[r1][c1] = '';
@@ -597,11 +574,9 @@
             else { 
                 document.getElementById('chess-status').innerText = "CHECK!"; 
                 document.getElementById('chess-status').style.color = "#ff4444";
-                document.getElementById('board-wrapper').classList.add('board-check');
             }
         } else {
             document.getElementById('chess-status').style.color = "#baca44";
-            document.getElementById('board-wrapper').classList.remove('board-check');
             if(!hasMoves) { 
                 document.getElementById('chess-status').innerText = "DRAW (Stalemate)"; 
                 chessActive = false; clearInterval(chessTimer); gameOver = true; 
@@ -995,6 +970,114 @@
         if(e.key === "ArrowRight") changeDirection("RIGHT");
         if(e.key === "ArrowDown") changeDirection("DOWN");
     });
+
+    /* ================= HIGH-PERFORMANCE REPTILE ENGINE ================= */
+    const rCanvas = document.getElementById('reptileCanvas');
+    const rCtx = rCanvas.getContext('2d');
+
+    let rWidth, rHeight;
+    let rMouse = { x: window.innerWidth/2, y: window.innerHeight/2 };
+    let rHead = { x: window.innerWidth/2, y: window.innerHeight/2 };
+
+    const rSegments = [];
+    const rSegCount = 45; // Length of the reptile
+    const rSegDist = 10;  // Spacing
+    let rWalkCycle = 0;
+
+    // Initialize segments
+    for (let i = 0; i < rSegCount; i++) {
+        rSegments.push({ x: rHead.x, y: rHead.y, angle: 0 });
+    }
+
+    function rResize() {
+        rWidth = rCanvas.width = window.innerWidth;
+        rHeight = rCanvas.height = window.innerHeight;
+    }
+
+    window.addEventListener('mousemove', e => {
+        rMouse.x = e.clientX;
+        rMouse.y = e.clientY;
+    });
+
+    function drawReptileEngine() {
+        rCtx.clearRect(0, 0, rWidth, rHeight);
+
+        // Smooth easing for head
+        rHead.x += (rMouse.x - rHead.x) * 0.12;
+        rHead.y += (rMouse.y - rHead.y) * 0.12;
+
+        // Movement detection for walking animation
+        let dHead = Math.sqrt(Math.pow(rMouse.x - rSegments[0].x, 2) + Math.pow(rMouse.y - rSegments[0].y, 2));
+        if (dHead > 1) rWalkCycle += dHead * 0.08;
+
+        rSegments[0].x = rHead.x;
+        rSegments[0].y = rHead.y;
+
+        for (let i = 1; i < rSegCount; i++) {
+            let s1 = rSegments[i - 1];
+            let s2 = rSegments[i];
+
+            let dx = s1.x - s2.x;
+            let dy = s1.y - s2.y;
+            s2.angle = Math.atan2(dy, dx);
+            s2.x = s1.x - Math.cos(s2.angle) * rSegDist;
+            s2.y = s1.y - Math.sin(s2.angle) * rSegDist;
+
+            renderReptileBody(s2, i);
+        }
+        requestAnimationFrame(drawReptileEngine);
+    }
+
+    function renderReptileBody(seg, i) {
+        rCtx.save();
+        rCtx.translate(seg.x, seg.y);
+        rCtx.rotate(seg.angle);
+
+        // Bio-Neon Theme to match portfolio
+        rCtx.strokeStyle = "#00eaff"; 
+        rCtx.lineWidth = 1.5;
+        rCtx.shadowBlur = 8;
+        rCtx.shadowColor = "rgba(0, 234, 255, 0.5)";
+
+        // Calculate body width (tapered tail)
+        let bW = Math.sin((i / rSegCount) * Math.PI) * 20;
+
+        // Draw Ribs
+        rCtx.beginPath();
+        rCtx.moveTo(0, -bW / 2);
+        rCtx.lineTo(0, bW / 2);
+        rCtx.stroke();
+
+        // Walking Legs (at segment 10 and 25)
+        if (i === 10 || i === 25) {
+            let lStep = Math.sin(rWalkCycle) * 18;
+            let rStep = Math.sin(rWalkCycle + Math.PI) * 18;
+
+            rCtx.beginPath();
+            // Right Leg
+            rCtx.moveTo(0, bW / 2);
+            rCtx.lineTo(rStep, bW / 2 + 15);
+            rCtx.lineTo(rStep + 5, bW / 2 + 18);
+            // Left Leg
+            rCtx.moveTo(0, -bW / 2);
+            rCtx.lineTo(lStep, -bW / 2 - 15);
+            rCtx.lineTo(lStep + 5, -bW / 2 - 18);
+            rCtx.stroke();
+        }
+
+        // Spine Dot
+        rCtx.fillStyle = "white";
+        rCtx.shadowBlur = 0;
+        rCtx.beginPath();
+        rCtx.arc(0, 0, 1.2, 0, Math.PI * 2);
+        rCtx.fill();
+
+        rCtx.restore();
+    }
+
+    window.addEventListener('resize', rResize);
+    rResize();
+    drawReptileEngine();
 
 </script>
 </body>
