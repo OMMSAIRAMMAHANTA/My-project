@@ -126,6 +126,24 @@
             box-shadow: 0 0 25px rgba(0, 234, 255, 0.6);
         }
 
+        /* Music Button Styles */
+        .music-btn {
+            position: fixed; bottom: 40px; right: 40px;
+            width: 55px; height: 55px; border-radius: 50%;
+            background: transparent; backdrop-filter: blur(10px);
+            border: 2px solid var(--primary-accent);
+            color: var(--primary-accent); font-size: 20px;
+            display: flex; justify-content: center; align-items: center;
+            cursor: pointer; z-index: 9997; /* Below full menu but above canvas */
+            box-shadow: 0 0 15px rgba(0, 234, 255, 0.2), inset 0 0 10px rgba(0, 234, 255, 0.1);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .music-btn:hover {
+            transform: scale(1.1);
+            background: var(--primary-accent); color: #000;
+            box-shadow: 0 0 25px rgba(0, 234, 255, 0.6);
+        }
+
         .full-menu {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(3, 5, 10, 0.98); backdrop-filter: blur(25px);
@@ -307,6 +325,7 @@
             .glow-circle { width: 240px; height: 240px; padding: 10px;}
             .full-menu a { font-size: 1.6rem; letter-spacing: 2px; -webkit-text-stroke: 1px rgba(255,255,255,0.4); }
             .hamburger-btn { top: 20px; right: 20px; width: 45px; height: 45px; font-size: 18px;}
+            .music-btn { bottom: 20px; right: 20px; width: 45px; height: 45px; font-size: 18px; }
             .section-title { font-size: 1.8rem; }
             #chess-overlay h1 { font-size: 2.5rem !important; }
             .project-grid { grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); }
@@ -464,12 +483,23 @@
     <div class="bg-glow"></div>
     <div class="bg-glow-2"></div>
 
+    <!-- AUDIO ELEMENT FOR BACKGROUND MUSIC -->
+    <audio id="bgMusic" loop>
+        <source src="dream.wav" type="audio/wav">
+        Your browser does not support the audio element.
+    </audio>
+
     <!-- THE POWERFUL ANIMATED BACKGROUND ENGINE -->
     <canvas id="reptileCanvas"></canvas>
 
     <!-- HAMBURGER MENU BUTTON -->
     <div class="hamburger-btn" onclick="toggleMenu()">
         <i class="fa-solid fa-bars" id="menu-icon"></i>
+    </div>
+
+    <!-- MUSIC TOGGLE BUTTON -->
+    <div class="music-btn" onclick="toggleMusic()" title="Play/Pause Background Music">
+        <i class="fa-solid fa-volume-xmark" id="music-icon"></i>
     </div>
 
     <!-- FULL SCREEN MENU -->
@@ -1176,6 +1206,24 @@
 
     <!-- ================= ALL JAVASCRIPT ================= -->
     <script>
+        // --- MUSIC LOGIC ---
+        let isMusicPlaying = false;
+        const bgMusic = document.getElementById('bgMusic');
+        const musicIcon = document.getElementById('music-icon');
+
+        function toggleMusic() {
+            if (isMusicPlaying) {
+                bgMusic.pause();
+                musicIcon.classList.remove('fa-volume-high');
+                musicIcon.classList.add('fa-volume-xmark');
+            } else {
+                bgMusic.play().catch(e => console.log("Audio play blocked by browser:", e));
+                musicIcon.classList.remove('fa-volume-xmark');
+                musicIcon.classList.add('fa-volume-high');
+            }
+            isMusicPlaying = !isMusicPlaying;
+        }
+
         // --- 0. ASTRANITI & PORTFOLIO INITIALIZATION ---
         lucide.createIcons();
 
